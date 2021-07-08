@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.3/index.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.3/theme-chalk/index.min.css" rel="stylesheet">
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+        <div class="reveal">
+            <div class="slides">
+                <section>Slide 1</section>
+
+                <section>
+                    <div id='steps'>
+                    	<!-- <a href="javascript:void(0)">获取数据</a> -->
+                    	<el-button>aaaaa</el-button>
+                    </div>
+                </section>
+
+                <section>
+                    <section>Vertical Slide 1</section>
+                    <section>Vertical Slide 2</section>
+                </section>
+                
+                <section>Slide 4</section>
+            </div>
+        </div>
+</body>
+
+</html>
+
+
+<script type="text/javascript">
+	var steps = new Vue({
+        el: '#steps',
+        data: function() {
+            return {
+                isShow: true
+            }
+        },
+        methods: {
+            
+        },
+        mounted: function() {
+        	console.log(123111)
+        }
+    })    
+</script>
+
