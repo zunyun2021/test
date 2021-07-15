@@ -13,28 +13,181 @@
 </head>
 
 <body>
-        <div id='steps'>
-            pingall
+        <div id='steps' style="width: 1340px; margin: 0 auto;margin-top: 100px;">
+            <template>
+                <div style="color: #fff; height: 20px">
+                    <!-- 只能重装用户2065544的机器 -->
+                </div>
+                <el-input
+                  type="textarea"
+                  :autosize="{ minRows: 10}"
+                  placeholder="多个请换行"
+                  v-model="textarea2">
+                </el-input>
+
+                <el-button @click='chk_textarea2' type='primary' style='width: 100%; margin-top: 20px'>PING</el-button>
+
+                <div style="margin-top: 45px" v-loading='loading'>
+                    <div class="itemdiv" v-for='ip in gridData.ipArr'>
+                        <func_price_mit :ip='ip' :dianjitime='gridData.clickTime'></func_price_mit>
+                    </div>
+                </div>
+
+                <div class="fixed-tongji" v-if='tongjiShow'>
+                    <div style="width: 1340px; margin: 0 auto; display: flex; justify-content: space-between;">                 
+                        <span>点击时间：{{gridData.clickTime}}，统计数量{{gridData.ipArr.length}}</span>
+                        <span>
+                            ping不通数量：{{tongji4001.length}}
+                            <el-popover
+                                popper-class='popper-class-2021'
+                                placement="top-start"
+                                title="不通的IP"
+                                width="200"
+                                trigger="hover">
+                                <el-tag slot="reference" size='mini'  style="margin-left: 5px">查看</el-tag>
+                                <p v-for='item in tongji4001'>
+                                    {{item.ip}}
+                                </p>
+                            </el-popover>
+                        </span>
+                        <span>ping通：{{tongji4000.length}}</span>
+                    </div>
+                </div>
+            </template>
         </div>
 </body>
 
 </html>
 
 
+<template id="func_price_mit">
+    <div style="display: flex; justify-content: space-between;">
+        <div  style="min-width: 230px">{{ip}}</div>
+        <div>
+            <pre v-if='isComplete' style="font-size: 13px; line-height: 1.5">{{tips}}</pre>
+            <span v-else>
+                <i class="el-icon-loading"></i>
+                ping...
+            </span>
+        </div>
+    </div>
+</template>
 <script type="text/javascript">
-	var steps = new Vue({
-        el: '#steps',
+    Vue.component('func_price_mit', {
+        template: '#func_price_mit',
+        props: ['ip', 'dianjitime'], // 需要小写
         data: function() {
             return {
-                isShow: true
+                isComplete: false,
+                tips: '',
             }
         },
         methods: {
-            
+           
         },
         mounted: function() {
-        	console.log(123111)
+            console.log(this.ip)
+            console.log(this.dianjitime)
+            var _this = this;
+            _this.isComplete = false;
+            $.ajax({
+                url: steps.host + '/home/index/chk_ip_and_ping?ip=' + this.ip + '&clickTime=' + this.dianjitime,
+                type: 'get',
+                dataType: 'json',
+                success: function(res) {
+                    _this.isComplete = true;
+                    _this.tips = res.msg;
+                    if (res.code == 4000) {
+                        steps.tongji4000.push({ip: _this.ip})
+                    } else if (res.code == 4001) {
+                        steps.tongji4001.push({ip: _this.ip})
+                    }
+                },
+                error: function(xhr) {
+                    
+                },
+            });
         }
-    })    
+    });
 </script>
+
+<script type="text/javascript">
+    var steps = new Vue({
+        el: '#steps',
+        data: function() {
+            return {
+                host: 'http://27.50.169.106',
+                textarea2: '',
+                gridData: [],
+                loading: false,
+                tongjiShow: false,
+                tongji4000: [],
+                tongji4001: [],
+            }
+        },
+        methods: {
+            chk_textarea2: function() {
+                if (!this.textarea2) {
+                    this.$message.error('请输入IP');
+                    return;
+                }
+
+                var fasdgsdgsdg = this.textarea2.replace(/[\r\n]/g,",");
+                var _this = this;
+                _this.gridData = [];
+                _this.loading = true;
+                _this.tongjiShow = false;
+                _this.tongji4000 = [];
+                _this.tongji4001 = [];
+                $.ajax({
+                    url: this.host + '/home/index/chk_textarea2_bytime',
+                    type: 'post',
+                    data: {
+                        txt: fasdgsdgsdg
+                    },
+                    dataType: 'json',
+                    success: function(res) {
+                        _this.loading = false;
+                        _this.tongjiShow = true;
+                        _this.gridData = res;
+                        console.log(res)
+                    },
+                    error: function(xhr) {
+                        
+                    },
+                });
+            },
+        },
+        mounted: function() {
+            console.log(1111111)
+            
+        }
+    })
+</script>
+
+<style type="text/css">
+    body {
+        background-color: #000;
+    }
+    .itemdiv {
+        background-color: #fff;
+        margin-bottom: 10px;
+        font-size: 30px;
+        padding: 0 35px;
+    }
+    .fixed-tongji {
+        position: fixed;
+        top: 0px;
+        background: #646473;
+        left: 0;
+        right: 0;
+        z-index: 99999999;
+        color: #fff;
+        font-size: 18px;
+    }
+    .popper-class-2021 {
+        height: 600px;
+        overflow: scroll;
+    }
+</style>
 
